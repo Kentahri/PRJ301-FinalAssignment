@@ -1,0 +1,81 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(200, 248, 239);
+    font-family: Arial, sans-serif;
+}
+
+.login-box {
+    background: white;
+    padding: 30px 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 320px;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 15px;
+    background-color: #ffe5e5;
+    padding: 10px 15px;
+    border: 1px solid red;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.success-message {
+    color: green;
+    font-weight: bold;
+    margin-bottom: 15px;
+    background-color: #e5ffe5;
+    padding: 10px 15px;
+    border: 1px solid green;
+    border-radius: 5px;
+    text-align: center;
+}
+
+
+.login-box h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.button {
+    display: inline-block;
+    width: 100%;
+    padding: 10px;
+    background-color: #3b77c0;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+.button:hover {
+    background-color: #2f66aa;
+}
+
+
+.button:hover {
+    background-color: #2f66aa;
+}

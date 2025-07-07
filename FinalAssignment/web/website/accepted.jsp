@@ -60,9 +60,11 @@
                 </div>
                 <div class="user-info">
                     <i class="fas fa-user"></i>
-                    <span>Nguyễn Văn A</span>
+                    <span>${sessionScope.account.displayname}</span>
                 </div>
-                <button class="logout-btn">Đăng xuất</button>
+                <form action="${pageContext.request.contextPath}/logout" method="post">
+                    <button class="logout-btn">Đăng xuất</button>
+                </form>
             </div>
             <div class="request-list">
                 <h2 style="margin-bottom: 20px; color: #2c3e50">
@@ -77,61 +79,94 @@
                             <th>Phòng ban</th>
                             <th>Từ ngày</th>
                             <th>Đến ngày</th>
+                            <th>Ghi chú</th>
                             <th>Trạng thái</th>
+                            <th>người xử lí</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><strong class="info-highlight">1</strong></td>
-                            <td><strong class="info-highlight">mr Tèo</strong></td>
-                            <td><strong class="info-highlight">Phòng IT</strong></td>
-                            <td><strong class="info-highlight">2025-06-12</strong></td>
-                            <td><strong class="info-highlight">2025-06-14</strong></td>
-                            <td>
-                                <span class="status pending">Chờ duyệt</span>
-                            </td>
-                            <td>
-                                <button
-                                    class="view-btn"
-                                    onclick="openModal('mr Tèo', 'Phòng IT', '2025-06-12', '2025-06-14', 'Về quê có việc')"
-                                    >
-                                    Chi tiết
-                                </button>
-                            </td>
-                        </tr>
+                        <c:forEach var="r" items="${requests}" varStatus="loop">
+                            <tr>
+                                <td><strong class="info-highlight">${loop.index + 1}</strong></td>
+                                <td><strong class="info-highlight">${r.createdBy.username}</strong></td>
+                                <td><strong class="info-highlight">${r.department.name}</strong></td>
+                                <td><strong class="info-highlight">${r.startDate}</strong></td>
+                                <td><strong class="info-highlight">${r.endDate}</strong></td>
+                                <td><strong class="info-highlight">${r.note}</strong></td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${r.status == 0}">
+                                            <span class="status pending">Chờ duyệt</span>
+                                        </c:when>
+                                        <c:when test="${r.status == 1}">
+                                            <span class="status approved">Đã duyệt</span>
+                                        </c:when>
+                                        <c:when test="${r.status == 2}">
+                                            <span class="status rejected">Đã từ chối</span>
+                                        </c:when>
+                                    </c:choose>
+                                </td>
+                                <td><strong class="info-highlight">
+                                        <c:if test="${r.processBy != null}">
+                                            ${r.processBy.username}
+                                        </c:if>
+                                        <c:if test="${r.processBy == null}">
+                                            <em>Chưa xử lý</em>
+                                        </c:if>
+                                    </strong>
+                                </td>
+                                <td>
+                                    <c:if test="${r.status == 0}">
+                                        <button
+                                            class="view-btn"
+                                            onclick="openModal(${r.id}, '${r.createdBy.username}', '${r.startDate}', '${r.endDate}', '${r.reason}')">
+                                            Chi tiết
+                                        </button>
+                                    </c:if>
+                                </td>
+                            </tr>
+                        </c:forEach>
                     </tbody>
                 </table>
             </div>
 
             <div id="modal" class="modal-overlay">
                 <div class="modal-content">
-                    <span class="close-x" onclick="closeModal()">×</span>
-                    <h2>Duyệt đơn nghỉ phép</h2>
-                    <p id="modal-user"></p>
+                    <form method="post" action="accepted">
+                        <span class="close-x" onclick="closeModal()">×</span>
+                        <h2>Duyệt đơn nghỉ phép</h2>
+                        <p id="modal-user"></p>
 
-                    <label>Từ ngày:</label>
-                    <input type="date" id="modal-from" disabled />
+                        <input type="hidden" name="id" id="modal-id" />
 
-                    <label>Tới ngày:</label>
-                    <input type="date" id="modal-to" disabled />
+                        <label>Từ ngày:</label>
+                        <input type="date" id="modal-from" disabled />
 
-                    <label>Lý do:</label>
-                    <textarea id="modal-reason" rows="4" disabled></textarea>
+                        <label>Tới ngày:</label>
+                        <input type="date" id="modal-to" disabled />
 
-                    <div class="button-group">
-                        <button class="reject-btn" onclick="alert('Đã từ chối đơn')">
-                            <i class="fas fa-times"></i> Từ chối
-                        </button>
-                        <button class="approve-btn" onclick="alert('Đã duyệt đơn')">
-                            <i class="fas fa-check"></i> Duyệt
-                        </button>
-                        <button class="close-btn" onclick="closeModal()">
-                            <i class="fas fa-times-circle"></i> Đóng
-                        </button>
-                    </div>
+                        <label>Lý do:</label>
+                        <textarea id="modal-reason" rows="4" disabled></textarea>
+
+                        <label>Ghi chú xử lý:</label>
+                        <textarea name="note" rows="3"></textarea>
+
+                        <div class="button-group">
+                            <button class="reject-btn" name="action" value="reject">
+                                <i class="fas fa-times"></i> Từ chối
+                            </button>
+                            <button class="approve-btn" name="action" value="approve">
+                                <i class="fas fa-check"></i> Duyệt
+                            </button>
+                            <button class="close-btn" type="button" onclick="closeModal()">
+                                <i class="fas fa-times-circle"></i> Đóng
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
+
         </div>
     </body>
 </html>

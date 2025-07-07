@@ -11,6 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import model.Account;
 import model.LeaveRequest;
 
@@ -24,24 +27,54 @@ public class createController extends RoleController {
     protected void processPost(HttpServletRequest req, HttpServletResponse resp, Account account)
             throws ServletException, IOException {
 
-        String fromDate = req.getParameter("fromDate");
-        String toDate = req.getParameter("toDate");
+        String rawFromDate = req.getParameter("fromDate");
+        String rawToDate = req.getParameter("toDate");
         String reason = req.getParameter("reason");
 
-        LeaveRequest leave = new LeaveRequest();
-        leave.setStartDate(Date.valueOf(fromDate));
-        leave.setEndDate(Date.valueOf(toDate));
-        leave.setReason(reason);
-        leave.setStatus(0); // 0: chờ duyệt
-        leave.setCreatedBy(account);
-        leave.setProcessBy(null); // chưa duyệt
-        leave.setNote(null);      // chưa có ghi chú từ người duyệt
+        try {
+            // Chuyển sang LocalDate để dễ kiểm tra
+            LocalDate startDate = LocalDate.parse(rawFromDate);
+            LocalDate endDate = LocalDate.parse(rawToDate);
 
-        LeaveRequestDBContext db = new LeaveRequestDBContext();
-        db.insert(leave);
+            // Thời điểm hiện tại
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime minStartDateTime = now.plusHours(24);
+            LocalDate minStartDate = minStartDateTime.toLocalDate();
 
-        req.setAttribute("message", "Bạn đã tạo đơn nghỉ phép thành công!");
-        req.getRequestDispatcher("homepage.jsp").forward(req, resp);
+            // Ràng buộc startDate >= minStartDate (ít nhất sau 24h)
+            if (startDate.isBefore(minStartDate)) {
+                req.setAttribute("error", "Ngày bắt đầu phải sau ngày hiện tại ít nhất 1 ngày");
+                req.getRequestDispatcher("/website/create.jsp").forward(req, resp);
+                return;
+            }
+
+            // Ràng buộc endDate > startDate
+            if (!endDate.isAfter(startDate)) {
+                req.setAttribute("error", "Ngày kết thúc phải sau ngày bắt đầu.");
+                req.getRequestDispatcher("/website/create.jsp").forward(req, resp);
+                return;
+            }
+
+            // Nếu hợp lệ thì lưu vào DB
+            LeaveRequest leave = new LeaveRequest();
+            leave.setStartDate(Date.valueOf(startDate));
+            leave.setEndDate(Date.valueOf(endDate));
+            leave.setReason(reason);
+            leave.setStatus(0); // chờ duyệt
+            leave.setCreatedBy(account);
+            leave.setProcessBy(null);
+            leave.setNote(null);
+
+            LeaveRequestDBContext db = new LeaveRequestDBContext();
+            db.insert(leave);
+
+            req.setAttribute("message", "Bạn đã tạo đơn nghỉ phép thành công!");
+            req.getRequestDispatcher("homepage.jsp").forward(req, resp);
+
+        } catch (DateTimeParseException ex) {
+            req.setAttribute("error", "Định dạng ngày không hợp lệ.");
+            req.getRequestDispatcher("/website/create.jsp").forward(req, resp);
+        }
     }
 
     @Override

@@ -12,15 +12,25 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 public class LeaveRequest extends BaseModel {
-    private Account createdBy;         
-    private Date startDate;          
-    private Date endDate;           
-    private String reason;           
-    private int status;           
-    private Timestamp createdAt;     
+
+    private Account createdBy;
+    private Date startDate;
+    private Date endDate;
+    private String reason;
+    private int status;
+    private Timestamp createdAt;
     private Timestamp updatedAt;
     private Account processBy;
     private String note;
+    private Department department;
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
 
     public Account getCreatedBy() {
         return createdBy;

@@ -29,14 +29,6 @@
         <servlet-class>controller.authentication.LogoutController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RegisterController</servlet-name>
-        <servlet-class>controller.website.RegisterController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>UpdateRoleController</servlet-name>
-        <servlet-class>controller.website.UpdateRoleController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>myrequestController</servlet-name>
         <servlet-class>controller.website.myrequestController</servlet-class>
     </servlet>
@@ -57,10 +49,6 @@
         <url-pattern>/website/accepted</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>historyController</servlet-name>
-        <url-pattern>/website/history</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>agendaController</servlet-name>
         <url-pattern>/website/agenda</url-pattern>
     </servlet-mapping>
@@ -71,10 +59,6 @@
     <servlet-mapping>
         <servlet-name>myrequestController</servlet-name>
         <url-pattern>/website/myrequest</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>updateRequestController</servlet-name>
-        <url-pattern>/website/editrequest</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

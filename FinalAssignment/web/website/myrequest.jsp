@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -65,6 +67,7 @@
                             <th>Từ ngày</th>
                             <th>Đến ngày</th>
                             <th>Lý do</th>
+                            <th>Ghi chú</th>
                             <th>Trạng thái</th>
                             <th>Thao tác</th>
                         </tr>
@@ -73,9 +76,14 @@
                         <c:forEach var="r" items="${requestScope.myRequests}" varStatus="loop">
                             <tr>
                                 <td>${loop.index + 1}</td>
-                                <td>${r.startDate}</td>
-                                <td>${r.endDate}</td>
+                                <td>
+                                    <fmt:formatDate value="${r.startDate}" pattern="yyyy-MM-dd"/>
+                                </td>
+                                <td>
+                                    <fmt:formatDate value="${r.endDate}" pattern="yyyy-MM-dd"/>
+                                </td>
                                 <td>${r.reason}</td>
+                                <td>${r.note}</td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${r.status == 0}">
@@ -91,7 +99,13 @@
                                 </td>
                                 <td>
                                     <c:if test="${r.status == 0}">
-                                        <button class="view-btn" onclick="openEditModal(${r.id}, '${r.startDate}', '${r.endDate}', '${r.reason}')">
+                                        <button 
+                                            class="view-btn"
+                                            data-id="${r.id}"
+                                            data-from="<fmt:formatDate value="${r.startDate}" pattern="yyyy-MM-dd"/>"
+                                            data-to="<fmt:formatDate value="${r.endDate}" pattern="yyyy-MM-dd"/>"
+                                            data-reason="${fn:escapeXml(r.reason)}"
+                                            onclick="openEditModal(this)">
                                             Chi tiết
                                         </button>
                                     </c:if>
@@ -106,7 +120,7 @@
                     <span class="close-x" onclick="closeModal()">×</span>
                     <h2>Chi tiết đơn nghỉ phép</h2>
 
-                    <form id="editForm" method="post" action="editrequest">
+                    <form id="editForm" method="post" action="myrequest" onsubmit="return validateForm()">
                         <input type="hidden" name="id" id="request-id" />
 
                         <label>Từ ngày:</label>

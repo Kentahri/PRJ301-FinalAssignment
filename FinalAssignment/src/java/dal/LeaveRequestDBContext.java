@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.Department;
 
 /**
  *
@@ -84,9 +85,7 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
                     + "    FROM Employee e\n"
                     + "    INNER JOIN Account_Employee ae ON ae.eid = e.eid\n"
                     + "    WHERE ae.aid = ?\n"
-                    + "\n"
                     + "    UNION ALL\n"
-                    + "\n"
                     + "    SELECT e.eid\n"
                     + "    FROM Employee e\n"
                     + "    INNER JOIN EmployeeHierarchy eh ON e.managerid = eh.eid\n"
@@ -98,17 +97,21 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
                     + "    model.endDate,\n"
                     + "    model.status,\n"
                     + "    model.createdBy,\n"
-                    + "    creator.username AS createdUser,\n"
+                    + "    creator.displayname AS createdUser,\n"
                     + "    model.processedBy,\n"
-                    + "    processor.username AS processedUser,\n"
-                    + "    model.note\n"
+                    + "    processor.displayname AS processedUser,\n"
+                    + "    model.note,\n"
+                    + "    d.id AS depId,\n"
+                    + "    d.name AS depName\n"
                     + "FROM EmployeeHierarchy eh\n"
                     + "INNER JOIN Account_Employee ae ON ae.eid = eh.eid\n"
                     + "INNER JOIN Account creator ON creator.aid = ae.aid\n"
                     + "INNER JOIN LeaveRequest model ON model.createdBy = creator.aid\n"
                     + "LEFT JOIN Account processor ON processor.aid = model.processedBy\n"
+                    + "INNER JOIN Account_Employee ae_creator ON ae_creator.aid = creator.aid\n"
+                    + "INNER JOIN Employee e_creator ON e_creator.eid = ae_creator.eid\n"
+                    + "INNER JOIN Department d ON d.id = e_creator.did\n"
                     + "WHERE creator.aid != ?";
-
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, aid);
             stm.setInt(2, aid);
@@ -136,6 +139,10 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
                 }
 
                 r.setNote(rs.getString("note"));
+                Department dep = new Department();
+                dep.setId(rs.getInt("depId"));
+                dep.setName(rs.getString("depName"));
+                r.setDepartment(dep);
                 model.add(r);
             }
         } catch (SQLException ex) {
@@ -150,6 +157,48 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
             }
         }
         return model;
+    }
+
+    public void approveRequest(int requestId, int processorId, String note) {
+        try {
+            String sql = "UPDATE LeaveRequest SET status = 1, processedBy = ?, note = ? WHERE id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, processorId);
+            stm.setString(2, note);
+            stm.setInt(3, requestId);
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if (connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public void rejectRequest(int requestId, int processorId, String note) {
+        try {
+            String sql = "UPDATE LeaveRequest SET status = 2, processedBy = ?, note = ? WHERE id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, processorId);
+            stm.setString(2, note);
+            stm.setInt(3, requestId);
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if (connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void delete(int id, int accountId) {

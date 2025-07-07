@@ -69,6 +69,9 @@
             <div class="content">
                 <h2 style="margin-bottom: 20px; color: #2c3e50"></h2>
                 <form class="leave-form" action="create" method="post">
+                    <c:if test="${not empty error}">
+                        <div class="error-message">${error}</div>
+                    </c:if>
                     <fieldset>
                         <legend>Đơn xin nghỉ phép</legend>
 

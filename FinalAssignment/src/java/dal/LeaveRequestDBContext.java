@@ -12,6 +12,9 @@ import model.Account;
 import model.LeaveRequest;
 import java.util.ArrayList;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Department;
@@ -247,6 +250,94 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
                 Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    public Map<Date, Map<Integer, String>> getAttendanceStatus(int departmentId, Date from, Date to) {
+        Map<Date, Map<Integer, String>> result = new LinkedHashMap<>();
+        try {
+            // Lấy danh sách nhân viên
+            String empSql = "SELECT e.eid, e.name "
+                    + "FROM Employee e "
+                    + "WHERE e.did = ?";
+            PreparedStatement empStm = connection.prepareStatement(empSql);
+            empStm.setInt(1, departmentId);
+            ResultSet empRs = empStm.executeQuery();
+
+            // Tạo map nhân viên
+            Map<Integer, String> employees = new LinkedHashMap<>();
+            while (empRs.next()) {
+                employees.put(empRs.getInt("eid"), empRs.getString("name"));
+            }
+
+            // Tạo danh sách ngày
+            long millisPerDay = 24 * 60 * 60 * 1000;
+            for (long time = from.getTime(); time <= to.getTime(); time += millisPerDay) {
+                result.put(new Date(time), new HashMap<>());
+            }
+
+            // Lấy danh sách đơn nghỉ phép
+            String leaveSql = "SELECT e.eid, lr.startDate, lr.endDate "
+                    + "FROM Employee e "
+                    + "JOIN Account_Employee ae ON e.eid = ae.eid "
+                    + "JOIN LeaveRequest lr ON lr.createdBy = ae.aid "
+                    + "WHERE e.did = ? AND lr.status = 1";
+            PreparedStatement leaveStm = connection.prepareStatement(leaveSql);
+            leaveStm.setInt(1, departmentId);
+            ResultSet leaveRs = leaveStm.executeQuery();
+
+            // Gán trạng thái nghỉ
+            while (leaveRs.next()) {
+                int eid = leaveRs.getInt("eid");
+                Date start = leaveRs.getDate("startDate");
+                Date end = leaveRs.getDate("endDate");
+                for (Date d : result.keySet()) {
+                    if (!d.before(start) && !d.after(end)) {
+                        result.get(d).put(eid, "leave");
+                    }
+                }
+            }
+
+            // Gán trạng thái đi làm hoặc tương lai
+            Date today = new Date(System.currentTimeMillis());
+            for (Date d : result.keySet()) {
+                Map<Integer, String> dayMap = result.get(d);
+                for (Integer eid : employees.keySet()) {
+                    if (!dayMap.containsKey(eid)) {
+                        if (d.after(today)) {
+                            dayMap.put(eid, "future");
+                        } else {
+                            dayMap.put(eid, "present");
+                        }
+                    }
+                }
+            }
+
+            // Đóng kết nối
+            empRs.close();
+            empStm.close();
+            leaveRs.close();
+            leaveStm.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+// Lấy danh sách nhân viên để render cột header
+    public Map<Integer, String> getEmployeesInDepartment(int departmentId) {
+        Map<Integer, String> employees = new LinkedHashMap<>();
+        try {
+            String sql = "SELECT eid, name FROM Employee WHERE did = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, departmentId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                employees.put(rs.getInt("eid"), rs.getString("name"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return employees;
     }
 
     @Override

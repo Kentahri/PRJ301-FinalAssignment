@@ -63,28 +63,6 @@ public class AccountDBContext extends DBContext<Account> {
         return null;
     }
 
-    public boolean register(Account acc) {
-        try {
-            String sql = "INSERT INTO Account(username, password, displayname) VALUES (?, ?, ?)";
-            PreparedStatement stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            stm.setString(1, acc.getUsername());
-            stm.setString(2, acc.getPassword());
-            stm.setString(3, acc.getDisplayname());
-            int affected = stm.executeUpdate();
-
-            if (affected > 0) {
-                ResultSet rs = stm.getGeneratedKeys();
-                if (rs.next()) {
-                    acc.setId(rs.getInt(1)); // gán ID vừa tạo cho account
-                    return true;
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountDBContext.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
-    }
-
     public void insertRoleForAccount(int aid, int rid) {
         try {
             String sql = "INSERT INTO Account_Role(aid, rid) VALUES (?, ?)";
@@ -94,31 +72,6 @@ public class AccountDBContext extends DBContext<Account> {
             stm.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(AccountDBContext.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void setRole(int aid, int rid) {
-        try {
-            String delete = "DELETE FROM Account_Role WHERE aid = ?";
-            PreparedStatement delStm = connection.prepareStatement(delete);
-            delStm.setInt(1, aid);
-            delStm.executeUpdate();
-
-            String insert = "INSERT INTO Account_Role (aid, rid) VALUES (?, ?)";
-            PreparedStatement insStm = connection.prepareStatement(insert);
-            insStm.setInt(1, aid);
-            insStm.setInt(2, rid);
-            insStm.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountDBContext.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(AccountDBContext.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 

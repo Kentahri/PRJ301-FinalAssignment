@@ -16,7 +16,7 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
             />
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/homepage.css"/>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/agenda.css"/>
         <script src="${pageContext.request.contextPath}/js/clock.js" defer></script>
     </head>
     <body>
@@ -81,36 +81,37 @@
                     <div style="color: red; margin-top:10px;">${error}</div>
                 </c:if>
 
-                <c:if test="${not empty agendaData}">
+                <c:if test="${not empty requestScope.statuses}">
                     <table class="agenda-table">
                         <thead>
                             <tr>
-                                <th>Ngày</th>
-                                    <c:forEach var="emp" items="${employees}">
-                                    <th>${emp.value}</th>
-                                    </c:forEach>
+                                <th>Nhân viên</th>
+                                    <c:forEach var="entry" items="${requestScope.statuses}">
+                                    <th>
+                                        <fmt:formatDate value="${entry.key}" pattern="yyyy-MM-dd"/>
+                                    </th>
+                                </c:forEach>
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach var="entry" items="${agendaData}">
+                            <c:forEach var="emp" items="${requestScope.employees}">
                                 <tr>
-                                    <td>
-                                        <fmt:formatDate value="${entry.key}" pattern="yyyy-MM-dd"/>
-                                    </td>
-                                    <c:forEach var="eid" items="${employees.keySet()}">
-                                        <c:set var="status" value="${entry.value[eid]}" />
-                                        <td
-                                            class="
+                                    <td>${emp.value}</td>
+                                    <c:forEach var="entry" items="${requestScope.statuses}">
+                                        <c:set var="status" value="${entry.value[emp.key]}" />
+                                        <td class="
                                             <c:choose>
                                                 <c:when test='${status=="present"}'>status-present</c:when>
                                                 <c:when test='${status=="leave"}'>status-leave</c:when>
+                                                <c:when test='${status=="rejected"}'>status-rejected</c:when>
                                                 <c:when test='${status=="future"}'>status-future</c:when>
                                             </c:choose>
                                             ">
                                             <c:choose>
                                                 <c:when test="${status=='present'}">✅</c:when>
-                                                <c:when test="${status=='leave'}">❌</c:when>
-                                                <c:when test="${status=='future'}">🔵</c:when>
+                                                <c:when test="${status=='leave'}">❌ <Strong>Duyệt</Strong></c:when>
+                                                <c:when test="${status=='rejected'}">❌ <Strong>Không Duyệt</Strong></c:when>
+                                                <c:when test="${status=='future'}">✨</c:when>
                                             </c:choose>
                                         </td>
                                     </c:forEach>

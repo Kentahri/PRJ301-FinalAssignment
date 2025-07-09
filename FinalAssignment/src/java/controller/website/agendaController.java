@@ -27,19 +27,25 @@ public class agendaController extends RoleController {
 
         if (fromStr == null || toStr == null || fromStr.isEmpty() || toStr.isEmpty()) {
             req.setAttribute("error", "Vui lòng chọn khoảng ngày");
-            req.getRequestDispatcher("/website/agenda.jsp").forward(req, resp);
+            req.getRequestDispatcher("../website/agenda.jsp").forward(req, resp);
             return;
         }
 
         // Kiểm tra xem account có nhân viên và phòng ban không
         if (account.getEmployee() == null || account.getEmployee().getDepartment() == null) {
             req.setAttribute("error", "Tài khoản của bạn chưa được liên kết với nhân viên hoặc phòng ban.");
-            req.getRequestDispatcher("/website/agenda.jsp").forward(req, resp);
+            req.getRequestDispatcher("../website/agenda.jsp").forward(req, resp);
             return;
         }
 
         Date from = Date.valueOf(fromStr);
         Date to = Date.valueOf(toStr);
+
+        if (from.after(to)) {
+            req.setAttribute("error", "Ngày bắt đầu không được lớn hơn ngày kết thúc.");
+            req.getRequestDispatcher("agenda.jsp").forward(req, resp);
+            return; // Dừng xử lý tiếp
+        }
 
         int departmentId = account.getEmployee().getDepartment().getId();
 
@@ -51,7 +57,7 @@ public class agendaController extends RoleController {
         req.setAttribute("employees", employees);
         req.setAttribute("fromDate", fromStr);
         req.setAttribute("toDate", toStr);
-        req.getRequestDispatcher("/website/agenda.jsp").forward(req, resp);
+        req.getRequestDispatcher("../website/agenda.jsp").forward(req, resp);
     }
 
     @Override

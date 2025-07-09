@@ -256,7 +256,7 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
         Map<Date, Map<Integer, String>> result = new LinkedHashMap<>();
         try {
             // Lấy danh sách nhân viên
-            String empSql = "SELECT e.eid, e.name "
+            String empSql = "SELECT e.eid, e.ename "
                     + "FROM Employee e "
                     + "WHERE e.did = ?";
             PreparedStatement empStm = connection.prepareStatement(empSql);
@@ -266,7 +266,7 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
             // Tạo map nhân viên
             Map<Integer, String> employees = new LinkedHashMap<>();
             while (empRs.next()) {
-                employees.put(empRs.getInt("eid"), empRs.getString("name"));
+                employees.put(empRs.getInt("eid"), empRs.getString("ename"));
             }
 
             // Tạo danh sách ngày
@@ -276,27 +276,33 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
             }
 
             // Lấy danh sách đơn nghỉ phép
-            String leaveSql = "SELECT e.eid, lr.startDate, lr.endDate "
-                    + "FROM Employee e "
-                    + "JOIN Account_Employee ae ON e.eid = ae.eid "
-                    + "JOIN LeaveRequest lr ON lr.createdBy = ae.aid "
-                    + "WHERE e.did = ? AND lr.status = 1";
+            String leaveSql = "SELECT e.eid, lr.startDate, lr.endDate, lr.status\n"
+                    + "    FROM Employee e\n"
+                    + "    JOIN Account_Employee ae ON e.eid = ae.eid\n"
+                    + "    JOIN LeaveRequest lr ON lr.createdBy = ae.aid\n"
+                    + "    WHERE e.did = ? AND lr.status IN (1,2)";
             PreparedStatement leaveStm = connection.prepareStatement(leaveSql);
             leaveStm.setInt(1, departmentId);
             ResultSet leaveRs = leaveStm.executeQuery();
 
-            // Gán trạng thái nghỉ
+            // Gán trạng thái dựa trên status
             while (leaveRs.next()) {
                 int eid = leaveRs.getInt("eid");
                 Date start = leaveRs.getDate("startDate");
                 Date end = leaveRs.getDate("endDate");
+                int status = leaveRs.getInt("status");
+
                 for (Date d : result.keySet()) {
                     if (!d.before(start) && !d.after(end)) {
-                        result.get(d).put(eid, "leave");
+                        if (status == 1) {
+                            result.get(d).put(eid, "leave"); // đã duyệt
+                        } else if (status == 2) {
+                            result.get(d).put(eid, "rejected"); // không duyệt
+                        }
                     }
                 }
             }
-
+            
             // Gán trạng thái đi làm hoặc tương lai
             Date today = new Date(System.currentTimeMillis());
             for (Date d : result.keySet()) {
@@ -327,12 +333,12 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
     public Map<Integer, String> getEmployeesInDepartment(int departmentId) {
         Map<Integer, String> employees = new LinkedHashMap<>();
         try {
-            String sql = "SELECT eid, name FROM Employee WHERE did = ?";
+            String sql = "SELECT eid, ename FROM Employee WHERE did = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, departmentId);
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                employees.put(rs.getInt("eid"), rs.getString("name"));
+                employees.put(rs.getInt("eid"), rs.getString("ename"));
             }
         } catch (SQLException ex) {
             Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);

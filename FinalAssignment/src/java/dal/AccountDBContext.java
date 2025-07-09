@@ -9,6 +9,8 @@ package dal;
  * @author anhqu
  */
 import model.Account;
+import model.Employee;
+import model.Department;
 import java.util.ArrayList;
 import java.sql.*;
 import java.util.logging.Level;
@@ -37,16 +39,43 @@ public class AccountDBContext extends DBContext<Account> {
 
     public Account login(String username, String password) {
         try {
-            String sql = "SELECT aid,username,displayname FROM Account WHERE username=? AND password=?";
+            String sql = " SELECT \n"
+                    + "                a.aid, \n"
+                    + "                a.username, \n"
+                    + "                a.displayname,\n"
+                    + "                e.eid,\n"
+                    + "                e.ename,\n"
+                    + "                e.did,\n"
+                    + "                d.name AS dname\n"
+                    + "            FROM Account a\n"
+                    + "            LEFT JOIN Account_Employee ea ON a.aid = ea.aid\n"
+                    + "            LEFT JOIN Employee e ON ea.eid = e.eid\n"
+                    + "            LEFT JOIN Department d ON e.did = d.id\n"
+                    + "            WHERE a.username = ? AND a.password = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, username);
             stm.setString(2, password);
             ResultSet rs = stm.executeQuery();
             if (rs.next()) {
                 Account account = new Account();
-                account.setUsername(username);
                 account.setId(rs.getInt("aid"));
+                account.setUsername(rs.getString("username"));
                 account.setDisplayname(rs.getString("displayname"));
+
+                int eid = rs.getInt("eid");
+                if (!rs.wasNull()) {
+                    Employee emp = new Employee();
+                    emp.setId(eid);
+                    emp.setName(rs.getString("ename"));
+
+                    Department dep = new Department();
+                    dep.setId(rs.getInt("did"));
+                    dep.setName(rs.getString("dname"));
+
+                    emp.setDepartment(dep);
+                    account.setEmployee(emp);
+                }
+
                 return account;
             }
         } catch (SQLException ex) {

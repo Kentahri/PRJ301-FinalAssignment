@@ -67,59 +67,75 @@
             </div>
 
             <div class="content">
-                <h2>Lịch làm việc nhân viên</h2>
+                <div class="box">
+                    <h2 class="agenda-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Lịch làm việc nhân viên
+                    </h2>
 
-                <form method="post" action="agenda">
-                    Từ ngày:
-                    <input type="date" name="fromDate" value="${fromDate}" required>
-                    Đến ngày:
-                    <input type="date" name="toDate" value="${toDate}" required>
-                    <button type="submit">Xem lịch</button>
-                </form>
+                    <form method="post" action="agenda" class="date-form">
+                        <label>Từ ngày:</label>
+                        <input type="date" name="fromDate" value="${fromDate}" required>
+                        <label>Đến ngày:</label>
+                        <input type="date" name="toDate" value="${toDate}" required>
+                        <button type="submit"><i class="fas fa-search"></i> Xem lịch</button>
+                    </form>
 
-                <c:if test="${not empty error}">
-                    <div style="color: red; margin-top:10px;">${error}</div>
-                </c:if>
+                    <c:if test="${not empty error}">
+                        <div class="error-message">${error}</div>
+                    </c:if>
 
-                <c:if test="${not empty requestScope.statuses}">
-                    <table class="agenda-table">
-                        <thead>
-                            <tr>
-                                <th>Nhân viên</th>
-                                    <c:forEach var="entry" items="${requestScope.statuses}">
-                                    <th>
-                                        <fmt:formatDate value="${entry.key}" pattern="yyyy-MM-dd"/>
-                                    </th>
-                                </c:forEach>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach var="emp" items="${requestScope.employees}">
+                    <c:if test="${not empty requestScope.statuses}">
+                        <table class="agenda-table">
+                            <thead>
                                 <tr>
-                                    <td>${emp.value}</td>
-                                    <c:forEach var="entry" items="${requestScope.statuses}">
-                                        <c:set var="status" value="${entry.value[emp.key]}" />
-                                        <td class="
-                                            <c:choose>
-                                                <c:when test='${status=="present"}'>status-present</c:when>
-                                                <c:when test='${status=="leave"}'>status-leave</c:when>
-                                                <c:when test='${status=="rejected"}'>status-rejected</c:when>
-                                                <c:when test='${status=="future"}'>status-future</c:when>
-                                            </c:choose>
-                                            ">
-                                            <c:choose>
-                                                <c:when test="${status=='present'}">✅</c:when>
-                                                <c:when test="${status=='leave'}">❌ <Strong>Duyệt</Strong></c:when>
-                                                <c:when test="${status=='rejected'}">❌ <Strong>Không Duyệt</Strong></c:when>
-                                                <c:when test="${status=='future'}">✨</c:when>
-                                            </c:choose>
-                                        </td>
+                                    <th>Nhân viên</th>
+                                        <c:forEach var="entry" items="${requestScope.statuses}">
+                                        <th>
+                                            <fmt:formatDate value="${entry.key}" pattern="yyyy-MM-dd"/>
+                                        </th>
                                     </c:forEach>
                                 </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
-                </c:if>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="emp" items="${requestScope.employees}">
+                                    <tr>
+                                        <td>${emp.value}</td>
+                                        <c:forEach var="entry" items="${requestScope.statuses}">
+                                            <c:set var="status" value="${entry.value[emp.key]}" />
+                                            <td class="
+                                                <c:choose>
+                                                    <c:when test='${status=="present"}'>status-present</c:when>
+                                                    <c:when test='${status=="leave"}'>status-leave</c:when>
+                                                    <c:when test='${status=="rejected"}'>status-rejected</c:when>
+                                                    <c:when test='${status=="future"}'>status-future</c:when>
+                                                </c:choose>
+                                                ">
+                                                <c:choose>
+                                                    <c:when test="${status=='present'}">✅</c:when>
+                                                    <c:when test="${status=='leave'}">❌ <strong>Duyệt</strong></c:when>
+                                                    <c:when test="${status=='rejected'}">❌ <strong>Không Duyệt</strong></c:when>
+                                                    <c:when test="${status=='future'}">✨</c:when>
+                                                </c:choose>
+                                            </td>
+                                        </c:forEach>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                        <div class="legend">
+                            <div class="legend-item">
+                                ✅ <span>Đi làm</span>
+                            </div>
+                            <div class="legend-item">
+                                ❌ <span>Nghỉ làm</span>
+                            </div>
+                            <div class="legend-item">
+                                ✨ <span>Chưa có lịch</span>
+                            </div>
+                        </div>
+                    </c:if>
+                </div>
             </div>
         </div>
     </body>

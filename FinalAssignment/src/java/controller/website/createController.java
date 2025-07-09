@@ -69,7 +69,7 @@ public class createController extends RoleController {
             db.insert(leave);
 
             req.setAttribute("message", "Bạn đã tạo đơn nghỉ phép thành công!");
-            req.getRequestDispatcher("homepage.jsp").forward(req, resp);
+            req.getRequestDispatcher("homepage").forward(req, resp);
 
         } catch (DateTimeParseException ex) {
             req.setAttribute("error", "Định dạng ngày không hợp lệ.");

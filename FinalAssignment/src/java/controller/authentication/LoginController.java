@@ -57,7 +57,7 @@ public class LoginController extends HttpServlet {
             session.setAttribute("account", account);
             session.setAttribute("allowedEntrypoints", allowedEntrypoints);
 
-            resp.sendRedirect("website/homepage.jsp");
+            resp.sendRedirect("website/homepage");
         }
 
     }

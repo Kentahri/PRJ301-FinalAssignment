@@ -66,9 +66,17 @@
             </div>
 
             <div class="content">
-                <div class="notification">
-                    <i class="fas fa-bell"></i>
-                    <span>${requestScope.message}</span>
+                <c:if test="${not empty requestScope.welcomeMessage}">
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <span>${requestScope.welcomeMessage}</span>
+                        <button class="close-btn" onclick="this.parentElement.style.display = 'none'">×</button>
+                    </div>
+                </c:if>
+                <c:forEach var="ms" items="${requestScope.message}">
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <span>${ms}</span>
                     <button
                         class="close-btn"
                         onclick="this.parentElement.style.display = 'none'"
@@ -76,27 +84,8 @@
                         ×
                     </button>
                 </div>
-                <div class="notification">
-                    <i class="fas fa-bell"></i>
-                    <span>Hệ thống sẽ bảo trì vào lúc 23:00 tối nay.</span>
-                    <button
-                        class="close-btn"
-                        onclick="this.parentElement.style.display = 'none'"
-                        >
-                        ×
-                    </button>
-                </div>
-                <div class="notification">
-                    <i class="fas fa-bell"></i>
-                    <span>Chào mừng bạn quay trở lại làm việc!</span>
-                    <button
-                        class="close-btn"
-                        onclick="this.parentElement.style.display = 'none'"
-                        >
-                        ×
-                    </button>
-                </div>
-            </div>
+            </c:forEach>
         </div>
-    </body>
+    </div>
+</body>
 </html>

@@ -120,7 +120,7 @@
                     <span class="close-x" onclick="closeModal()">×</span>
                     <h2>Chi tiết đơn nghỉ phép</h2>
 
-                    <form id="editForm" method="post" action="myrequest" onsubmit="return validateForm()">
+                    <form id="editForm" method="post" action="myrequest">
                         <input type="hidden" name="id" id="request-id" />
 
                         <label>Từ ngày:</label>

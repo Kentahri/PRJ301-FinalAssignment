@@ -13,8 +13,10 @@ import model.Employee;
 import model.Department;
 import java.util.ArrayList;
 import java.sql.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.Role;
 
 /**
  *
@@ -92,18 +94,6 @@ public class AccountDBContext extends DBContext<Account> {
         return null;
     }
 
-    public void insertRoleForAccount(int aid, int rid) {
-        try {
-            String sql = "INSERT INTO Account_Role(aid, rid) VALUES (?, ?)";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, aid);
-            stm.setInt(2, rid);
-            stm.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountDBContext.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public ArrayList<Account> getAllAccounts() {
         ArrayList<Account> accounts = new ArrayList<>();
         try {
@@ -131,6 +121,88 @@ public class AccountDBContext extends DBContext<Account> {
         return accounts;
     }
 
+    public boolean createAccountAndEmployee(
+            String username,
+            String password,
+            String displayname,
+            String employeename,
+            int departmentId,
+            List<Integer> roleIds) {
+
+        try {
+            // Tắt tự động commit
+            connection.setAutoCommit(false);
+
+            // 1. Insert Account
+            String sqlAcc = "INSERT INTO Account(username, password, displayname) VALUES (?, ?, ?)";
+            PreparedStatement psAcc = connection.prepareStatement(sqlAcc, Statement.RETURN_GENERATED_KEYS);
+            psAcc.setString(1, username);
+            psAcc.setString(2, password);
+            psAcc.setString(3, displayname);
+            psAcc.executeUpdate();
+
+            ResultSet rsAcc = psAcc.getGeneratedKeys();
+            if (!rsAcc.next()) {
+                connection.rollback();
+                return false;
+            }
+            int aid = rsAcc.getInt(1);
+
+            // 2. Insert Employee
+            String sqlEmp = "INSERT INTO Employee(ename, did) VALUES (?, ?)";
+            PreparedStatement psEmp = connection.prepareStatement(sqlEmp, Statement.RETURN_GENERATED_KEYS);
+            psEmp.setString(1, employeename);
+            psEmp.setInt(2, departmentId);
+            psEmp.executeUpdate();
+
+            ResultSet rsEmp = psEmp.getGeneratedKeys();
+            if (!rsEmp.next()) {
+                connection.rollback();
+                return false;
+            }
+            int eid = rsEmp.getInt(1);
+
+            // 3. Insert Account_Employee
+            String sqlAE = "INSERT INTO Account_Employee(aid, eid, active) VALUES (?, ?, ?)";
+            PreparedStatement psAE = connection.prepareStatement(sqlAE);
+            psAE.setInt(1, aid);
+            psAE.setInt(2, eid);
+            psAE.setBoolean(3, true);
+            psAE.executeUpdate();
+
+            // 4. Insert Account_Role
+            String sqlAR = "INSERT INTO Account_Role(aid, rid) VALUES (?, ?)";
+            PreparedStatement psAR = connection.prepareStatement(sqlAR);
+            for (Integer rid : roleIds) {
+                psAR.setInt(1, aid);
+                psAR.setInt(2, rid);
+                psAR.executeUpdate();
+            }
+
+            // Hoàn tất
+            connection.commit();
+            return true;
+
+        } catch (SQLException ex) {
+            // Rollback khi lỗi
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            ex.printStackTrace();
+            return false;
+
+        } finally {
+            // Bật lại AutoCommit
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public ArrayList<Account> list() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -143,7 +215,6 @@ public class AccountDBContext extends DBContext<Account> {
 
     @Override
     public void insert(Account account) {
-
     }
 
     @Override
@@ -155,5 +226,4 @@ public class AccountDBContext extends DBContext<Account> {
     public void delete(int id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-
 }

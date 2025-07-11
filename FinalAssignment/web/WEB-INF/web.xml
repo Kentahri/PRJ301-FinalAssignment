@@ -13,10 +13,6 @@
         <servlet-class>controller.website.acceptedController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>historyController</servlet-name>
-        <servlet-class>controller.website.historyController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>agendaController</servlet-name>
         <servlet-class>controller.website.agendaController</servlet-class>
     </servlet>
@@ -29,12 +25,12 @@
         <servlet-class>controller.website.myrequestController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>updateRequestController</servlet-name>
-        <servlet-class>controller.website.updateRequestController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>HomePageController</servlet-name>
         <servlet-class>controller.website.HomepageController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateAccountController</servlet-name>
+        <servlet-class>controller.authentication.CreateAccountController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
@@ -63,6 +59,10 @@
     <servlet-mapping>
         <servlet-name>HomePageController</servlet-name>
         <url-pattern>/website/homepage</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateAccountController</servlet-name>
+        <url-pattern>/admin/createaccount</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

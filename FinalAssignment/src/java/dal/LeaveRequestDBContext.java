@@ -280,7 +280,7 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
                     + "    FROM Employee e\n"
                     + "    JOIN Account_Employee ae ON e.eid = ae.eid\n"
                     + "    JOIN LeaveRequest lr ON lr.createdBy = ae.aid\n"
-                    + "    WHERE e.did = ? AND lr.status IN (1,2)";
+                    + "    WHERE e.did = ? AND lr.status IN (0,1,2)";
             PreparedStatement leaveStm = connection.prepareStatement(leaveSql);
             leaveStm.setInt(1, departmentId);
             ResultSet leaveRs = leaveStm.executeQuery();
@@ -296,7 +296,7 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
                     if (!d.before(start) && !d.after(end)) {
                         if (status == 1) {
                             result.get(d).put(eid, "leave"); // đã duyệt
-                        } else if (status == 2) {
+                        } else if (status == 2 || status == 0) {
                             result.get(d).put(eid, "rejected"); // không duyệt
                         }
                     }

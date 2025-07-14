@@ -38,8 +38,8 @@
                 <a href="agenda"><i class="fas fa-calendar-alt"></i> Lịch làm việc</a>
             </c:if>
 
-            <c:if test="${permissions != null && permissions.contains('/admin/updaterole')}">
-                <a href="../admin/updaterole"><i class="fas fa-user-shield"></i> Cấp quyền tài khoản</a>
+            <c:if test="${permissions != null && permissions.contains('/admin/createaccount')}">
+                <a href="../admin/createaccount"><i class="fas fa-user-shield"></i> Cấp tài khoản</a>
             </c:if>
         </div>
 

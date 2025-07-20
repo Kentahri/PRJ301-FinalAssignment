@@ -7,9 +7,11 @@
     <head>
         <title>Đơn nghỉ phép của tôi</title>
         <link rel="stylesheet" href="../css/myrequest.css"/>
+        <link href="../css/pagging.css" rel="stylesheet" type="text/css"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
         <script src="../js/clock.js" defer></script>
         <script src="../js/myrequest.js" defer></script>
+        <script src="../js/pagging.js" type="text/javascript"></script>
     </head>
     <body>
         <div class="sidebar">
@@ -26,20 +28,12 @@
                 <a href="accepted"><i class="fas fa-check-circle"></i> Duyệt đơn nghỉ phép</a>
             </c:if>
 
-            <c:if test="${permissions != null && permissions.contains('/website/history')}">
-                <a href="history"><i class="fas fa-folder-open"></i> Lịch sử duyệt đơn</a>
-            </c:if>
-
             <c:if test="${permissions != null && permissions.contains('/website/myrequest')}">
                 <a href="myrequest"><i class="fas fa-list"></i> Lịch sử tạo đơn</a>
             </c:if>
 
             <c:if test="${permissions != null && permissions.contains('/website/agenda')}">
                 <a href="agenda"><i class="fas fa-calendar-alt"></i> Lịch làm việc</a>
-            </c:if>
-
-            <c:if test="${permissions != null && permissions.contains('/admin/createaccount')}">
-                <a href="../admin/createaccount"><i class="fas fa-user-shield"></i> Cấp tài khoản</a>
             </c:if>
         </div>
 
@@ -60,7 +54,7 @@
 
             <div class="request-list">
                 <h2>Danh sách đơn nghỉ phép đã tạo</h2>
-                <table class="request-table">
+                <table id="myTable" class="request-table">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -148,4 +142,9 @@
             </div>
         </div>
     </body>
+    <script>
+    window.addEventListener("DOMContentLoaded", function () {
+        paginateTable("myTable", 5);
+    });
+</script>
 </html>

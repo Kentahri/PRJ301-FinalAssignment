@@ -17,7 +17,9 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
             />
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/agenda.css"/>
+        <link href="../css/pagging.css" rel="stylesheet" type="text/css"/>
         <script src="${pageContext.request.contextPath}/js/clock.js" defer></script>
+        <script src="../js/pagging.js" type="text/javascript"></script>
     </head>
     <body>
         <div class="sidebar">
@@ -34,20 +36,12 @@
                 <a href="accepted"><i class="fas fa-check-circle"></i> Duyệt đơn nghỉ phép</a>
             </c:if>
 
-            <c:if test="${permissions != null && permissions.contains('/website/history')}">
-                <a href="history"><i class="fas fa-folder-open"></i> Lịch sử duyệt đơn</a>
-            </c:if>
-
             <c:if test="${permissions != null && permissions.contains('/website/myrequest')}">
                 <a href="myrequest"><i class="fas fa-list"></i> Lịch sử tạo đơn</a>
             </c:if>
 
             <c:if test="${permissions != null && permissions.contains('/website/agenda')}">
                 <a href="agenda"><i class="fas fa-calendar-alt"></i> Lịch làm việc</a>
-            </c:if>
-
-            <c:if test="${permissions != null && permissions.contains('/admin/createaccount')}">
-                <a href="../admin/createaccount"><i class="fas fa-user-shield"></i> Cấp tài khoản</a>
             </c:if>
         </div>
 
@@ -86,7 +80,7 @@
                     </c:if>
 
                     <c:if test="${not empty requestScope.statuses}">
-                        <table class="agenda-table">
+                        <table id="myTable" class="agenda-table">
                             <thead>
                                 <tr>
                                     <th>Nhân viên</th>
@@ -109,6 +103,7 @@
                                                     <c:when test='${status=="leave"}'>status-leave</c:when>
                                                     <c:when test='${status=="rejected"}'>status-rejected</c:when>
                                                     <c:when test='${status=="future"}'>status-future</c:when>
+                                                    <c:when test='${status=="weekend"}'>status-weekend</c:when>
                                                 </c:choose>
                                                 ">
                                                 <c:choose>
@@ -116,6 +111,7 @@
                                                     <c:when test="${status=='leave'}">❌ <strong>Duyệt</strong></c:when>
                                                     <c:when test="${status=='rejected'}">❌ <strong>Không Duyệt</strong></c:when>
                                                     <c:when test="${status=='future'}">✨</c:when>
+                                                    <c:when test="${status=='weekend'}"> 🛌 </c:when>
                                                 </c:choose>
                                             </td>
                                         </c:forEach>
@@ -133,10 +129,18 @@
                             <div class="legend-item">
                                 ✨ <span>Chưa có lịch</span>
                             </div>
+                            <div class="legend-item">
+                                🛌 <span>Cuối tuần</span>
+                            </div>
                         </div>
                     </c:if>
                 </div>
             </div>
         </div>
     </body>
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            paginateTable("myTable", 5);
+        });
+    </script>
 </html>

@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
 import model.Account;
 
@@ -31,7 +33,6 @@ public class agendaController extends RoleController {
             return;
         }
 
-        // Kiểm tra xem account có nhân viên và phòng ban không
         if (account.getEmployee() == null || account.getEmployee().getDepartment() == null) {
             req.setAttribute("error", "Tài khoản của bạn chưa được liên kết với nhân viên hoặc phòng ban.");
             req.getRequestDispatcher("../website/agenda.jsp").forward(req, resp);
@@ -44,14 +45,31 @@ public class agendaController extends RoleController {
         if (from.after(to)) {
             req.setAttribute("error", "Ngày bắt đầu không được lớn hơn ngày kết thúc.");
             req.getRequestDispatcher("agenda.jsp").forward(req, resp);
-            return; // Dừng xử lý tiếp
+            return;
         }
 
         int departmentId = account.getEmployee().getDepartment().getId();
-
         LeaveRequestDBContext db = new LeaveRequestDBContext();
         Map<Date, Map<Integer, String>> statusMap = db.getAttendanceStatus(departmentId, from, to);
         Map<Integer, String> employees = db.getEmployeesInDepartment(departmentId);
+
+        // Đánh dấu ngày nghỉ cuối tuần
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(from);
+        while (!cal.getTime().after(to)) {
+            Date currentDate = new Date(cal.getTimeInMillis());
+            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+
+            if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
+                Map<Integer, String> dayStatus = statusMap.getOrDefault(currentDate, new HashMap<>());
+                for (Integer empId : employees.keySet()) {
+                    dayStatus.put(empId, "weekend");
+                }
+                statusMap.put(currentDate, dayStatus);
+            }
+
+            cal.add(Calendar.DATE, 1);
+        }
 
         req.setAttribute("statuses", statusMap);
         req.setAttribute("employees", employees);

@@ -33,9 +33,11 @@ public class LoginController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String user = req.getParameter("user");
         String pass = req.getParameter("pass");
+        
+         String hashedPass = HashUtil.sha256(pass);
 
         AccountDBContext db = new AccountDBContext();
-        Account account = db.login(user, pass);
+        Account account = db.login(user, hashedPass);
         if (account == null) {
             req.setAttribute("message", "fail");
             req.getRequestDispatcher("website/login.jsp").forward(req, resp);

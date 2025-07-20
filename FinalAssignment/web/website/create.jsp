@@ -33,20 +33,12 @@
                 <a href="accepted"><i class="fas fa-check-circle"></i> Duyệt đơn nghỉ phép</a>
             </c:if>
 
-            <c:if test="${permissions != null && permissions.contains('/website/history')}">
-                <a href="history"><i class="fas fa-folder-open"></i> Lịch sử duyệt đơn</a>
-            </c:if>
-
             <c:if test="${permissions != null && permissions.contains('/website/myrequest')}">
                 <a href="myrequest"><i class="fas fa-list"></i> Lịch sử tạo đơn</a>
             </c:if>
 
             <c:if test="${permissions != null && permissions.contains('/website/agenda')}">
                 <a href="agenda"><i class="fas fa-calendar-alt"></i> Lịch làm việc</a>
-            </c:if>
-
-            <c:if test="${permissions != null && permissions.contains('/admin/createaccount')}">
-                <a href="../admin/createaccount"><i class="fas fa-user-shield"></i> Cấp tài khoản</a>
             </c:if>
 
         </div>
@@ -74,11 +66,6 @@
                     </c:if>
                     <fieldset>
                         <legend>Đơn xin nghỉ phép</legend>
-
-                        <p>
-                            User: <strong>${sessionScope.account.displayname}</strong>, Role: <strong>${sessionScope.account.roles[0].name}</strong>
-                            Dep: <strong>phòng IT</strong>
-                        </p>
 
                         <label for="from-date">Từ ngày:</label>
                         <input type="date" id="from-date" name="fromDate" required />

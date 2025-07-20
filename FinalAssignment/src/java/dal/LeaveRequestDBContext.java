@@ -114,7 +114,8 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
                     + "INNER JOIN Account_Employee ae_creator ON ae_creator.aid = creator.aid\n"
                     + "INNER JOIN Employee e_creator ON e_creator.eid = ae_creator.eid\n"
                     + "INNER JOIN Department d ON d.id = e_creator.did\n"
-                    + "WHERE creator.aid != ?";
+                    + "WHERE creator.aid != ?"
+                    + "ORDER BY model.startDate DESC";
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setInt(1, aid);
             stm.setInt(2, aid);

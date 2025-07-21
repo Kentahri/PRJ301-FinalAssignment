@@ -76,13 +76,15 @@ public class myrequestController extends RoleController {
 
             db.update(request);
 
-            resp.sendRedirect("myrequest?message=updated");
+            req.setAttribute("message", "Bạn đã cập nhật đơn nghỉ phép thành công!");
+            req.getRequestDispatcher("homepage").forward(req, resp);
         } else if ("delete".equals(action)) {
             // Xoá đơn
             int id = Integer.parseInt(req.getParameter("id"));
             db.delete(id, account.getId());
 
-            resp.sendRedirect("myrequest?message=deleted");
+            req.setAttribute("message", "Bạn đã xóa đơn nghỉ phép thành công!");
+            req.getRequestDispatcher("homepage").forward(req, resp);
         } else {
             resp.sendRedirect("myrequest");
         }

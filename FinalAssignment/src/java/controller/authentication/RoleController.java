@@ -29,20 +29,10 @@ public abstract class RoleController extends BaseAuthenticationController {
     private boolean isGrantedAccessControl(HttpServletRequest req, Account account) {
         String current_access_entrypoint = req.getServletPath();
 
-        if (account.getRoles() == null || account.getRoles().isEmpty()) {
-            RoleDBContext db = new RoleDBContext();
-            ArrayList<Role> roles = db.importRoles(account.getId());
-            account.setRoles(roles);
-            req.getSession().setAttribute("account", account);
+        Set<String> allowedEntrypoints = (Set<String>) req.getSession().getAttribute("allowedEntrypoints");
+        if (allowedEntrypoints == null) {
+            return false;
         }
-
-        Set<String> allowedEntrypoints = new HashSet<>();
-        for (Role role : account.getRoles()) {
-            for (Feature feature : role.getFeatures()) {
-                allowedEntrypoints.add(feature.getEntrypoint());
-            }
-        }
-        req.getSession().setAttribute("allowedEntrypoints", allowedEntrypoints);
 
         return allowedEntrypoints.contains(current_access_entrypoint);
     }

@@ -17,9 +17,9 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
             />
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/agenda.css"/>
-        <link href="../css/pagging.css" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/css/pagging.css" rel="stylesheet" type="text/css"/>
         <script src="${pageContext.request.contextPath}/js/clock.js" defer></script>
-        <script src="../js/pagging.js" type="text/javascript"></script>
+        <script src="${pageContext.request.contextPath}/js/pagging.js" type="text/javascript"></script>
     </head>
     <body>
         <div class="sidebar">

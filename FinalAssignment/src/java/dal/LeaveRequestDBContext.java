@@ -225,34 +225,6 @@ public class LeaveRequestDBContext extends DBContext<LeaveRequest> {
         }
     }
 
-    public void updateStatus(int requestId, int status, int processedBy, String note) {
-        try {
-            String sql = "UPDATE LeaveRequest "
-                    + "SET status = ?, "
-                    + "processedBy = ?, "
-                    + "note = ?, "
-                    + "updatedAt = GETDATE() "
-                    + "WHERE id = ?";
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, status);
-            stm.setInt(2, processedBy);
-            stm.setString(3, note);
-            stm.setInt(4, requestId);
-
-            stm.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(LeaveRequestDBContext.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
     public Map<Date, Map<Integer, String>> getAttendanceStatus(int departmentId, Date from, Date to) {
         Map<Date, Map<Integer, String>> result = new LinkedHashMap<>();
         try {

@@ -16,8 +16,8 @@ public class HomepageController extends HttpServlet {
         if (acc == null) {
             return;
         }
-        String rname = acc.getEmployee() != null ? acc.getEmployee().getName() : "";
-        String welcomeMsg = "Xin chào " + rname + ". Chào mừng bạn quay trở lại làm việc!";
+        String ename = acc.getEmployee() != null ? acc.getEmployee().getName() : "";
+        String welcomeMsg = "Xin chào " + ename + ". Chào mừng bạn quay trở lại làm việc!";
         req.setAttribute("welcomeMessage", welcomeMsg);
     }
 

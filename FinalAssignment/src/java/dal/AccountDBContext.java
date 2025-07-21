@@ -8,16 +8,13 @@ package dal;
  *
  * @author anhqu
  */
-import java.security.MessageDigest;
 import model.Account;
 import model.Employee;
 import model.Department;
 import java.util.ArrayList;
 import java.sql.*;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.Role;
 
 /**
  *

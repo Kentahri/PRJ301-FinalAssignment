@@ -274,8 +274,8 @@ body {
 }
 .status-weekend {
     background-color: #e2eafc;
-    color: #555;
-    font-style: italic;
+    border: 1px solid #007bff;
+    border-radius: 6px;
     text-align: center;
 }
 

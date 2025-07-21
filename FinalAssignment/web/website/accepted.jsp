@@ -15,10 +15,10 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
             />
-        <link rel="stylesheet" href="../css/accepted.css"/>
-        <link href="../css/pagging.css" rel="stylesheet" type="text/css"/>
-        <script src="../js/clock.js" defer></script>
-        <script src="../js/accepted.js" defer></script>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/accepted.css"/>
+        <link href="${pageContext.request.contextPath}/css/pagging.css" rel="stylesheet" type="text/css"/>
+        <script src="${pageContext.request.contextPath}/js/clock.js" defer></script>
+        <script src="${pageContext.request.contextPath}/js/accepted.js" defer></script>
         <script src="${pageContext.request.contextPath}/js/pagging.js"></script>
     </head>
     <body>
